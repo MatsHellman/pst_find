@@ -20,7 +20,8 @@ Basic Funtcionality of the scripts:
 
 * MovePSTFiles.ps1
     * [x] Read output from FindPSTFiles
-    * [ ] Show user information that Outlook needs to be closed
+    * [ ] Show user information that Outlook needs to be closed, as we wont
+          check if the PST file is connected in Outlook and it might be in use.
         * [ ] Close Outlook.exe process
     * [ ] Display move PST file GUI with recommendations on where to store file
     * [ ] Separate the information and text to manage localization of messages
