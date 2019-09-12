@@ -30,3 +30,8 @@ Basic Funtcionality of the scripts:
     * [ ] Verify functionality on Windows 7
     * [ ] Test Configuration Item in ConfigMGR
     * [ ] Outlook start after PST file has been moved
+
+Future development
+-------
+* MovePSTFiles.ps1
+    * [] Read different Outlook versions REG Keys and change the mapping to the new file location

@@ -1,55 +1,69 @@
 #Main Function
 function main {
+    
     Add-Type -AssemblyName System.Windows.Forms
     Add-Type -AssemblyName PresentationFramework
+    
     #File and Folder information
-    $InFile         = $env:USERPROFILE + "/FindPST.csv"
-    $OutDir         = $env:USERPROFILE
+    $InFile             = $env:USERPROFILE + "/FindPST.csv"
+    $OutFile            = $env:USERPROFILE + "/Desktop/PstFilesMovedTo.txt"
 
     #Import the list of PST files to move
-    $Files = Get-Content $InFile
-    $FileCount = $Files.Count
-    $MoveNowMessage =   "Email archive file(s) have been found in your user folder, theese files" +
-                        "need to be moved for OneDrive for Business to be able to sync files " +
-                        "successfully. You currently have, " + $FileCount + " PST file(s) in your folders." +
-                        "Do you want to move theese files now?"
+    $Files              = Get-Content $InFile
+    $FileCount          = $Files.Count
+    $MoveNowMessage     =   "Email archive file(s) have been found in your user folder, theese files" +
+                            "need to be moved for OneDrive for Business to be able to sync files " +
+                            "successfully. You currently have, " + $FileCount + " PST file(s) in your folders." +
+                            "Do you want to move theese files now?"
+    $MoveNowWindowname  =   "PST files found in your personal folders"
+    $MoveNowButton      =   "YesNo"
+    $MoveNowType        =   "Error"
 
-    $msgMoveNow = [System.Windows.Messagebox]::Show(
-        $MoveNowMessage,
-        'PST files found in your personal folders',
-        'YesNo',
-        'Error'
-        )
-    switch ($msgMoveNow) {
-        Yes { 
-            $Answer = $True 
+    $msgMoveNow = [System.Windows.Messagebox]::Show( $MoveNowMessage, $MoveNowWindowname,$MoveNowButton, $MoveNowType)
+        switch ($msgMoveNow) {
+            Yes { 
+                $Answer = $True
+                #Check if Outlook is running and if it's ok to close it.
+                $Answer = CheckOutlookRunning
+            }
+            Default {
+                $Answer = $False
+            }
         }
-        Default {
-            $Answer = $False
-        }
-    }
-    $Answer = CheckOutlookRunning
-    
+
     if($Answer){
-
-        #If Outlook is running we need to close it so it isn't locking the PST file
-        CheckOutlookRunning
-
 
         #Start moving the PST Files
         foreach ($File in $Files){
             # Start moving the found files
-            #$SelectedTarget = SelectTarget
-            Write-Host $SelectedTarget
-            Write-Host $File
-            #MovePST $File $SelectedTarget
+            $SelectedTarget = SelectTarget
+            
+            #Move File to selected target
+            MovePST $File $SelectedTarget
+            #Store the places in a file so the user and support can find them in the future
+            Add-Content -Path  $OutFile -Value $SelectedTarget
         }
-        
+        $DoneMovingMessage     =   "A text file has been stored on your desktop with our selected PST file location for future reference."
+        $DoneMovingWindowname  =   "Where are my PST files? "
+        $DoneMovingButton      =   "Ok"
+        $DoneMovingType        =   "Information"
+        [System.Windows.Messagebox]::Show( $DoneMovingMessage, $DoneMovingWindowname, $DoneMovingButton, $DoneMovingType  )
+
     }
     #Perform Cleanup before exiting
-    Remove-Variable InFile
-    Remove-Variable OutDir 
-    Remove-Variable Files 
+    Remove-Variable InFile -ErrorAction SilentlyContinue
+    Remove-Variable OutFile -ErrorAction SilentlyContinue
+    Remove-Variable Files -ErrorAction SilentlyContinue
+    Remove-Variable FileCount -ErrorAction SilentlyContinue
+    Remove-Variable MoveNowMessage -ErrorAction SilentlyContinue
+    Remove-Variable MoveNowWindowname -ErrorAction SilentlyContinue
+    Remove-Variable MoveNowButton -ErrorAction SilentlyContinue
+    Remove-Variable MoveNowType -ErrorAction SilentlyContinue
+    Remove-Variable DoneMovingMessage -ErrorAction SilentlyContinue
+    Remove-Variable DoneMovingWindowname -ErrorAction SilentlyContinue
+    Remove-Variable DoneMovingButton -ErrorAction SilentlyContinue
+    Remove-Variable DoneMovingType -ErrorAction SilentlyContinue
+
     
     #Done
     Return 0
@@ -60,16 +74,12 @@ function MovePST () {
         $PSTFile,
         $Target
     )
-    Write-Host "PSTFile to be moved is:" + $PSTFile
-    Write-Host "The target is:" + $Target
-    Move-Item -Path $PSTFile -Destination $Target
-    Write-Host "In MovePST"
-    Remove-Variable PSTFile
-    Remove-Variable Target
+
+    Move-Item -Path $PSTFile -Destination $Target -InformationAction SilentlyContinue
 }
 
 function SelectTarget {
-    Write-Host "In SelectTarget"
+    
     [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms")|Out-Null
 
     $foldername = New-Object System.Windows.Forms.FolderBrowserDialog
@@ -89,7 +99,7 @@ function CheckOutlookRunning {
                                 "Select YES to continue and the script will close Outlook, press NO to exit and" +
                                 " continue later."
     # get Outlook process
-    $outlook = Get-Process notepad -ErrorAction SilentlyContinue
+    $outlook = Get-Process Outlook -ErrorAction SilentlyContinue
 
     if ($outlook) {
         $msgCloseOutlook = [System.Windows.Messagebox]::Show(
@@ -102,10 +112,10 @@ function CheckOutlookRunning {
             Yes { 
                 $Answer = $True 
 
-                # try gracefully first
+                # Try gracefully first
                 $outlook.CloseMainWindow()
-                # kill after five seconds
-                Sleep 15
+                # Kill after fifteen seconds
+                Start-Sleep 15
                 if (!$outlook.HasExited) {
                 $outlook | Stop-Process -Force
                 }
