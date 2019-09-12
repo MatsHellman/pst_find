@@ -34,4 +34,4 @@ Basic Funtcionality of the scripts:
 Future development
 -------
 * MovePSTFiles.ps1
-    * [] Read different Outlook versions REG Keys and change the mapping to the new file location
+    * [ ] Read different Outlook versions REG Keys and change the mapping to the new file location
