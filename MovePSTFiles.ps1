@@ -1,28 +1,75 @@
+#Main Function
+function main {
+    Add-Type -AssemblyName System.Windows.Forms
+    Add-Type -AssemblyName PresentationFramework
+    #File and Folder information
+    $InFile         = $env:USERPROFILE + "/FindPST.csv"
+    $OutDir         = $env:USERPROFILE
 
-#File and Folder information
-$InFile = "/Users/mahellma/FindPST.csv"
-$OutDir = "/Users/mahellma/temp"
-$Files = Get-Content $InFile
+    #Import the list of PST files to move
+    $Files = Get-Content $InFile
+    $FileCount = $Files.Count
+    $MoveNowMessage =   "Email archive file(s) have been found in your user folder, theese files" +
+                        "need to be moved for OneDrive for Business to be able to sync files " +
+                        "successfully. You currently have, " + $FileCount + " PST file(s) in your folders." +
+                        "Do you want to move theese files now?"
 
-#Messages for the user
-$msgBoxOutlookRunning = [System.Windows.Messagebox]::Show(
-    'Outlook.exe is running and needs to be closed to move your email Archives.
-    Please close Outlook and click Ok',
-    'Outlook.exe is running',
-    'YesNo',
-    'Error'
-)
+    $msgMoveNow = [System.Windows.Messagebox]::Show(
+        $MoveNowMessage,
+        'PST files found in your personal folders',
+        'YesNo',
+        'Error'
+        )
+    switch ($msgMoveNow) {
+        Yes { 
+            $Answer = $True 
+        }
+        Default {
+            $Answer = $False
+        }
+    }
+    $Answer = CheckOutlookRunning
+    
+    if($Answer){
 
-function MovePST {
-    param (
+        #If Outlook is running we need to close it so it isn't locking the PST file
+        CheckOutlookRunning
+
+
+        #Start moving the PST Files
+        foreach ($File in $Files){
+            # Start moving the found files
+            #$SelectedTarget = SelectTarget
+            Write-Host $SelectedTarget
+            Write-Host $File
+            #MovePST $File $SelectedTarget
+        }
+        
+    }
+    #Perform Cleanup before exiting
+    Remove-Variable InFile
+    Remove-Variable OutDir 
+    Remove-Variable Files 
+    
+    #Done
+    Return 0
+}
+
+function MovePST () {
+    param(
         $PSTFile,
         $Target
     )
+    Write-Host "PSTFile to be moved is:" + $PSTFile
+    Write-Host "The target is:" + $Target
     Move-Item -Path $PSTFile -Destination $Target
-    
+    Write-Host "In MovePST"
+    Remove-Variable PSTFile
+    Remove-Variable Target
 }
 
 function SelectTarget {
+    Write-Host "In SelectTarget"
     [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms")|Out-Null
 
     $foldername = New-Object System.Windows.Forms.FolderBrowserDialog
@@ -37,30 +84,38 @@ function SelectTarget {
     
 }
 
-function ThrowMessage {
-    param (
-        $FileCount = $Files.Count
-    )
-    $msgBoxInput1 = [System.Windows.Messagebox]::Show(
-        'Email archive file(s) have been found in your user folder, theese files
-        need to be moved for OneDrive for Business to be able to sync files 
-        successfully. You currently have, $FileCount PST file(s) in your folders. 
-        Do you want to move theese files now?',
-        'PST files found in your personal folders',
-        'YesNo',
-        'Error'
+function CheckOutlookRunning {
+    $OutlookRunningMessage  =   "Outlook is running and needs to be closed to continue moving the file(s)." +
+                                "Select YES to continue and the script will close Outlook, press NO to exit and" +
+                                " continue later."
+    # get Outlook process
+    $outlook = Get-Process notepad -ErrorAction SilentlyContinue
+
+    if ($outlook) {
+        $msgCloseOutlook = [System.Windows.Messagebox]::Show(
+            $OutlookRunningMessage,
+            'Outlook needs to be closed',
+            'YesNo',
+            'Error'
         )
-}
+        switch ($msgCloseOutlook) {
+            Yes { 
+                $Answer = $True 
 
-function OutlookRunning {
-    While (Get-Process "Outlook.exe"){
-        $msgBoxOutlookRunning
+                # try gracefully first
+                $outlook.CloseMainWindow()
+                # kill after five seconds
+                Sleep 15
+                if (!$outlook.HasExited) {
+                $outlook | Stop-Process -Force
+                }
+            }
+            Default {
+                $Answer = $False
+            }
+        }
     }
-    
+    Return $Answer
 }
 
-while ($Files){
-    $ms
-
-    
-}
+main
