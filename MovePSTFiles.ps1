@@ -14,7 +14,7 @@ function main {
     $MoveNowMessage     =   "Email archive file(s) have been found in your user folder, theese files" +
                             "need to be moved for OneDrive for Business to be able to sync files " +
                             "successfully. You currently have, " + $FileCount + " PST file(s) in your folders." +
-                            "Do you want to move theese files now?"
+                            "Do you want to move these files now?"
     $MoveNowWindowname  =   "PST files found in your personal folders"
     $MoveNowButton      =   "YesNo"
     $MoveNowType        =   "Error"
