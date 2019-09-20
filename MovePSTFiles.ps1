@@ -5,8 +5,8 @@ function main {
     Add-Type -AssemblyName PresentationFramework
     
     #File and Folder information
-    $InFile             = $env:USERPROFILE + "/FindPST.csv"
-    $OutFile            = $env:USERPROFILE + "/Desktop/PstFilesMovedTo.txt"
+    $InFile             = $env:USERPROFILE + "\FindPST.csv"
+    $OutFile            = $env:USERPROFILE + "\Desktop\PstFilesMovedTo.txt"
 
     #Import the list of PST files to move
     $Files              = Get-Content $InFile
