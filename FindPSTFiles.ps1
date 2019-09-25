@@ -6,7 +6,7 @@ if (Get-ChildItem $OutFile -ErrorAction SilentlyContinue){
 }
 
 
-$Result = Get-ChildItem -Recurse -Path $Search -ErrorAction SilentlyContinue | Where-Object { $_.name -like '*.pst'}
+$Result = Get-ChildItem -Recurse -Path $Search -Include *.pst -ErrorAction SilentlyContinue 
 
 
 if ( $Result ){

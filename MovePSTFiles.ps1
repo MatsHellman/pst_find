@@ -10,11 +10,11 @@ function main {
 
     #Import the list of PST files to move
     $Files              = Get-Content $InFile
-    $FileCount          = $Files.Count
+    $FileCount          = $Files.Length
     $MoveNowMessage     =   "Email archive file(s) have been found in your user folder, theese files" +
-                            "need to be moved for OneDrive for Business to be able to sync files " +
-                            "successfully. You currently have, " + $FileCount + " PST file(s) in your folders." +
-                            "Do you want to move these files now?"
+                            " need to be moved for OneDrive for Business to be able to sync files " +
+                            "successfully. You currently have, " + $FileCount + " PST file(s) in your personal folders." +
+                            "Do you want to move the file(s) now?"
     $MoveNowWindowname  =   "PST files found in your personal folders"
     $MoveNowButton      =   "YesNo"
     $MoveNowType        =   "Error"
@@ -43,7 +43,7 @@ function main {
             #Store the places in a file so the user and support can find them in the future
             Add-Content -Path  $OutFile -Value $SelectedTarget
         }
-        $DoneMovingMessage     =   "A text file has been stored on your desktop with our selected PST file location for future reference."
+        $DoneMovingMessage     =   "A text file has been placed on your desktop with your selected PST file location for future reference."
         $DoneMovingWindowname  =   "Where are my PST files? "
         $DoneMovingButton      =   "Ok"
         $DoneMovingType        =   "Information"
@@ -75,7 +75,7 @@ function MovePST () {
         $Target
     )
 
-    Move-Item -Path $PSTFile -Destination $Target -InformationAction SilentlyContinue
+    Move-Item -Path $PSTFile -Destination $Target -ErrorAction SilentlyContinue
 }
 
 function SelectTarget {
