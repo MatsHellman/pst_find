@@ -11,10 +11,10 @@ function main {
     #Import the list of PST files to move
     $Files              = Get-Content $InFile
     $FileCount          = $Files.Length
-    $MoveNowMessage     =   "Email archive file(s) have been found in your user folder, theese files" +
-                            " need to be moved for OneDrive for Business to be able to sync files " +
-                            "successfully. You currently have, " + $FileCount + " PST file(s) in your personal folders." +
-                            "Do you want to move the file(s) now?"
+    $MoveNowMessage     =   "You have " + $FileCount + " e-mail archiving PST-file(s) on your device that are preventing"
+                            " OneDrive fo Business to sync your business files to the cloud." +
+                            " These files need to be moved to a different location on your device. Movint hte files has" +
+                            " no impact on your Outlook. Would you like to continue moving the file(s) now?"
     $MoveNowWindowname  =   "PST files found in your personal folders"
     $MoveNowButton      =   "YesNo"
     $MoveNowType        =   "Error"
@@ -43,7 +43,9 @@ function main {
             #Store the places in a file so the user and support can find them in the future
             Add-Content -Path  $OutFile -Value $SelectedTarget
         }
-        $DoneMovingMessage     =   "A text file has been placed on your desktop with your selected PST file location for future reference."
+        $DoneMovingMessage     =    "You have now successfully moved the file(s) and the OneDrive for Business sync can" +
+                                    " begin. You can find a text file on your computer’s desktop which has the selected" +
+                                    " location for the e-mail archiving files for future reference."
         $DoneMovingWindowname  =   "Where are my PST files? "
         $DoneMovingButton      =   "Ok"
         $DoneMovingType        =   "Information"
@@ -83,7 +85,7 @@ function SelectTarget {
     [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms")|Out-Null
 
     $foldername = New-Object System.Windows.Forms.FolderBrowserDialog
-    $foldername.Description = "Please select a folder. Ex. C:\Temp"
+    $foldername.Description = "Please select a folder. Ex. C:\Temp, all files will be moved here."
     $foldername.rootfolder = "MyComputer"
 
     if($foldername.ShowDialog() -eq "OK")
@@ -95,9 +97,9 @@ function SelectTarget {
 }
 
 function CheckOutlookRunning {
-    $OutlookRunningMessage  =   "Outlook is running and needs to be closed to continue moving the file(s)." +
-                                "Select YES to continue and the script will close Outlook, press NO to exit and" +
-                                " continue later."
+    $OutlookRunningMessage  =   "Your Outlook is open and it needs to be closed before we continue. Please save" +
+                                " all your on-going work. By selecting YES, your Outlook will be automatically closed." +
+                                " Select NO if you would like to continue later."
     # get Outlook process
     $outlook = Get-Process Outlook -ErrorAction SilentlyContinue
 
