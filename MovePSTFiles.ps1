@@ -11,10 +11,10 @@ function main {
     #Import the list of PST files to move
     $Files              = Get-Content $InFile
     $FileCount          = $Files.Length
-    $MoveNowMessage     =   "You have " + $FileCount + " e-mail archiving PST-file(s) on your device that are preventing"
-                            " OneDrive fo Business to sync your business files to the cloud." +
-                            " These files need to be moved to a different location on your device. Movint hte files has" +
-                            " no impact on your Outlook. Would you like to continue moving the file(s) now?"
+    $MoveNowMessage     =   "We are preparing your workstation for Windows 10 upgrade. There are " + $FileCount +
+                            " e-mail archiving PST-file(s) on your device that we need to move to a different location." +
+                            " Moving these files will take only few seconds and has no impact on your work. Would you " +
+                            "like to continue moving the file(s) now?"
     $MoveNowWindowname  =   "PST files found in your personal folders"
     $MoveNowButton      =   "YesNo"
     $MoveNowType        =   "Error"
@@ -46,9 +46,9 @@ function main {
         $DoneMovingMessage     =    "You have now successfully moved the file(s) and the OneDrive for Business sync can" +
                                     " begin. You can find a text file on your computer’s desktop which has the selected" +
                                     " location for the e-mail archiving files for future reference."
-        $DoneMovingWindowname  =   "Where are my PST files? "
-        $DoneMovingButton      =   "Ok"
-        $DoneMovingType        =   "Information"
+        $DoneMovingWindowname  =    "Where are my PST files? "
+        $DoneMovingButton      =    "Ok"
+        $DoneMovingType        =    "Information"
         [System.Windows.Messagebox]::Show( $DoneMovingMessage, $DoneMovingWindowname, $DoneMovingButton, $DoneMovingType  )
 
     }
