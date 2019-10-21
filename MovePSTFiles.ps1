@@ -10,7 +10,14 @@ function main {
 
     #Import the list of PST files to move
     $Files              = Get-Content $InFile
-    $FileCount          = $Files.Length
+    $FileCount          = $Files.Count
+    #Default PowerShell version in Windows 7 does not handle .Count like the newer ones and will show an empty filecount
+    #if there is only 1 file to move.
+    #Since this script is triggered by the non-compliance we know we have a minimum of one in the array, so to cut corners
+    #if FileCount is empty at this point, let's set it to one.
+    if (!$FileCount) {
+        $FileCount = 1
+    }
     $MoveNowMessage     =   "We are preparing your workstation for Windows 10 upgrade. There are " + $FileCount +
                             " e-mail archiving PST-file(s) on your device that we need to move to a different location." +
                             " Moving these files will take only few seconds and has no impact on your work. Would you " +
@@ -33,10 +40,10 @@ function main {
 
     if($Answer){
 
+        # Start moving the found files
+        $SelectedTarget = SelectTarget
         #Start moving the PST Files
         foreach ($File in $Files){
-            # Start moving the found files
-            $SelectedTarget = SelectTarget
             
             #Move File to selected target
             MovePST $File $SelectedTarget
