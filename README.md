@@ -28,7 +28,7 @@ Basic Funtcionality of the scripts:
 
 * Solution tests
     * [x] Verify functionality on Windows 7
-    * [ ] Test Configuration Item in ConfigMGR
+    * [x] Test Configuration Item in ConfigMGR
     * [ ] Outlook start after PST file has been moved
 
 Future development
